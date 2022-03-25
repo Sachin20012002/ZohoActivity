@@ -137,7 +137,7 @@ public class Main {
         System.out.println("Enter a number from the above choices");
             int choice = sc.nextInt();
             switch (choice) {
-                case 0 -> addMedication();
+                case 0 -> addMedication(role);
                 case 1 -> addUser(role);
                 case 2 -> ViewDetails(role);
                 default -> {
@@ -164,7 +164,7 @@ public class Main {
         return false;
     }
 
-    private static void addMedication() throws SQLException, ClassNotFoundException {
+    private static void addMedication(String role) throws SQLException, ClassNotFoundException {
         System.out.println("Enter Patient email");
         Class.forName("com.mysql.cj.jdbc.Driver");
         Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject", "root", "password");
@@ -176,8 +176,8 @@ public class Main {
             String medName= sc.next();
             if(!isExistMedicine(medName)) {
 
-                String str = "Insert into medicine (Name) values ('" + medName + "');";
-                st.executeUpdate(str);
+                String query = "Insert into medicine (Name) values ('" + medName + "');";
+                st.executeUpdate(query);
             }
             String medIdquery="select id from medicine where name='"+medName+"';";
             ResultSet resultSet=st.executeQuery(medIdquery);
@@ -194,7 +194,7 @@ public class Main {
         else{
             System.out.println("****<< NO PATIENT FOUND >>****");
         }
-        initialOptions();
+        showOperations(role);
     }
 
     private static boolean isExistMedicine(String s) throws SQLException, ClassNotFoundException {
@@ -242,29 +242,31 @@ public class Main {
             int choice=sc.nextInt();
             if(choice==1)
             {
-                viewMedication();
+                viewMedication(role);
             }
         }
         System.out.println("Enter the role name");
         String roleName=sc.next();
-            printDetails(roleName);
+            printDetails(roleName,role);
     }
 
-    private static void viewMedication() throws SQLException, ClassNotFoundException {
+    private static void viewMedication(String role) throws SQLException, ClassNotFoundException {
         System.out.println("Enter Your userId");
         int userid=sc.nextInt();
         Connection con= DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject","root","password");
         Statement st=con.createStatement();
         String query="select * from (select * from patientmedication inner join medicine on patientmedication.medicineId=medicine.id) as T where patientID="+userid;
         ResultSet resultSet=st.executeQuery(query);
+        System.out.println("<<<<< MEDICATIONS >>>>>>>");
         while (resultSet.next())
         {
-            System.out.println(resultSet.getString("name"));
+            System.out.println("*\t"+resultSet.getString("name"));
         }
-        initialOptions();
+        System.out.println("-------------------------------");
+        showOperations(role);
     }
 
-    private static void printDetails(String role) throws SQLException, ClassNotFoundException {
+    private static void printDetails(String role,String loginRole) throws SQLException, ClassNotFoundException {
         Class.forName("com.mysql.cj.jdbc.Driver");
         Connection con= DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject","root","password");
         Statement st=con.createStatement();
@@ -284,7 +286,7 @@ public class Main {
         {
             System.out.println("NO RECORDS FOUND");
         }
-       initialOptions();
+       showOperations(loginRole);
     }
 
     private static void addUser(String role) throws SQLException, ClassNotFoundException {
@@ -308,14 +310,14 @@ public class Main {
         if(isPatient)
         {
             System.out.println("You are not allowed to Add users");
-            initialOptions();
+            showOperations(role);
         }
         sc=new Scanner(System.in);
         String rolename=sc.next();
-        getUserDetails(rolename);
+        getUserDetails(rolename,role);
         }
 
-    private static void getUserDetails(String role) throws SQLException, ClassNotFoundException {
+    private static void getUserDetails(String role,String loginRole) throws SQLException, ClassNotFoundException {
         System.out.println("Enter Name");
         sc=new Scanner(System.in);
         String name=sc.next();
@@ -331,11 +333,12 @@ public class Main {
             st.executeUpdate(insertQuery);
             insertQuery = "Insert into login (email,password) values ('" + email + "','" + password + "');";
             st.executeUpdate(insertQuery);
+            System.out.println("<<<< USER ADDED SUCCESSFULLY >>>>>");
         }
         else {
             System.out.println("User already exists");
         }
-        initialOptions();
+        showOperations(loginRole);
     }
 
 
