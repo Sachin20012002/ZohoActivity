@@ -1,58 +1,64 @@
 package com.company;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
-    static Scanner sc;
+    static Scanner scanner;
+    static Connection connection;
+    
+
+    static {
+        try {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject","root","password");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection con= DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject","root","password");
-        Statement st=con.createStatement();
+        Statement statement= connection.createStatement();
         String adminExistQuery="select * from userdetails where role=\"Admin\"";
-        ResultSet r=st.executeQuery(adminExistQuery);
+        ResultSet r=statement.executeQuery(adminExistQuery);
         if(!r.next())
         {   String clearUserDetails="delete from userdetails";
-            st.executeUpdate(clearUserDetails);
+            statement.executeUpdate(clearUserDetails);
             String clearRole="delete from role";
-            st.executeUpdate(clearRole);
+            statement.executeUpdate(clearRole);
             String clearLogin="delete from login";
-            st.executeUpdate(clearLogin);
+            statement.executeUpdate(clearLogin);
             String clearMedicine="delete from medicine";
-            st.executeUpdate(clearMedicine);
+            statement.executeUpdate(clearMedicine);
             String setAutoIncrement="alter table userdetails AUTO_INCREMENT=1;";
-            st.executeUpdate(setAutoIncrement);
+            statement.executeUpdate(setAutoIncrement);
             setAutoIncrement="alter table login AUTO_INCREMENT=1;";
-            st.executeUpdate(setAutoIncrement);
+            statement.executeUpdate(setAutoIncrement);
             setAutoIncrement="alter table medicine AUTO_INCREMENT=1;";
-            st.executeUpdate(setAutoIncrement);
+            statement.executeUpdate(setAutoIncrement);
             greetAdmin();
         }
         initialOptions();
     }
 
-    private static void greetAdmin() throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection con= DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject","root","password");
-        Statement st=con.createStatement();
+    private static void greetAdmin() throws SQLException {
+        Statement statement= connection.createStatement();
         System.out.println("                    HOSPITAL MANAGEMENT SYSTEM");
         System.out.println("---------------------------------------------------------------------------");
         System.out.println();
         System.out.println("               Welcome Admin\n--------------------------------------\nEnter Your name");
-        sc=new Scanner(System.in);
-        String name=sc.next();
+        scanner =new Scanner(System.in);
+        String name= scanner.next();
         System.out.println("Enter your email");
-        String email=sc.next();
+        String email= scanner.next();
         System.out.println("Enter your password");
-        String password=sc.next();
+        String password= scanner.next();
         System.out.println("Enter the number of roles");
-        int n=sc.nextInt();
+        int n= scanner.nextInt();
         String insertUser="INSERT INTO userdetails (name,role,email) VALUES ('"+name+"','Admin','"+email+"');";
-        st.executeUpdate(insertUser);
+        statement.executeUpdate(insertUser);
         String insertLoginDetails="Insert into login (email,password) values ('"+email+"','"+password+"');";
-        st.executeUpdate(insertLoginDetails);
+        statement.executeUpdate(insertLoginDetails);
         String insertRole="insert into role (roleName,priority) values ('Admin',1);";
-        st.executeUpdate(insertRole);
+        statement.executeUpdate(insertRole);
+        connection.close();
         for(int i=0;i<n;i++)
         {
             addrole();
@@ -66,21 +72,19 @@ public class Main {
         System.out.println("---------------------------------------------------------------------------");
         System.out.println();
         System.out.println("1.\tLogin Page\n2.\tDatabase\n3.\tEND");
-        sc=new Scanner(System.in);
-        int choice=sc.nextInt();
+        scanner =new Scanner(System.in);
+        int choice= scanner.nextInt();
         switch (choice) {
             case 1 -> showLoginDetails();
             case 2 -> showDatabase();
-            case 3-> System.exit(0);
+            case 3->  System.exit(0);
         }
     }
 
     private static void showDatabase() throws SQLException, ClassNotFoundException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection con= DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject","root","password");
-        Statement st=con.createStatement();
+        Statement statement= connection.createStatement();
         String getUserDetails="select * from userdetails;";
-        ResultSet resultSet=st.executeQuery(getUserDetails);
+        ResultSet resultSet=statement.executeQuery(getUserDetails);
         System.out.println("              USER DATABASE");
         System.out.println("---------------------------------------------");
         boolean isExist=false;
@@ -99,7 +103,7 @@ public class Main {
             System.out.println("DataBase is Empty");
             System.out.println("--------------------");
         }
-
+        connection.close();
         initialOptions();
     }
 
@@ -108,11 +112,9 @@ public class Main {
         System.out.println("-------------------------------------------------");
         System.out.println();
         System.out.println("Login in as:\t");
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject", "root", "password");
-        Statement st = con.createStatement();
+        Statement statement = connection.createStatement();
         String getRoleQuery = "select roleName from role;";
-        ResultSet resultSet = st.executeQuery(getRoleQuery);
+        ResultSet resultSet = statement.executeQuery(getRoleQuery);
         System.out.println("    AVAILABLE USERS  ");
         System.out.println("------------------------");
         while (resultSet.next()) {
@@ -120,11 +122,13 @@ public class Main {
         }
         System.out.println();
         System.out.println("ENTER ROLE NAME");
-        String role = sc.next();
+        String role = scanner.next();
         if (!LoginValidation()) {
             System.out.println("\n******<< Invalid login Credentials >>*******\n");
+            connection.close();
             showLoginDetails();
         }
+        connection.close();
         showOperations(role);
     }
 
@@ -135,7 +139,7 @@ public class Main {
         }
         System.out.println("1.\tADD USER\n2.\tVIEW DETAILS\n3.\tLOG OUT\n");
         System.out.println("Enter a number from the above choices");
-            int choice = sc.nextInt();
+            int choice = scanner.nextInt();
             switch (choice) {
                 case 0 -> addMedication(role);
                 case 1 -> addUser(role);
@@ -147,14 +151,12 @@ public class Main {
             }
     }
 
-    private static boolean LoginValidation() throws ClassNotFoundException, SQLException {
+    private static boolean LoginValidation() throws SQLException {
         System.out.println("Enter your email");
-        String email=sc.next();
+        String email= scanner.next();
         System.out.println("Enter your password");
-        String password=sc.next();
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection con= DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject","root","password");
-        Statement st=con.createStatement();
+        String password= scanner.next();
+        Statement st= connection.createStatement();
         String str="select password from login where email='"+email+"';";
         ResultSet r=st.executeQuery(str);
         if(r.next())
@@ -166,29 +168,27 @@ public class Main {
 
     private static void addMedication(String role) throws SQLException, ClassNotFoundException {
         System.out.println("Enter Patient email");
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject", "root", "password");
-        Statement st = con.createStatement();
-        String email=sc.next();
+        Statement statement = connection.createStatement();
+        String email= scanner.next();
         if(isExist(email))
         {
             System.out.println("Enter Medication");
-            String medName= sc.next();
+            String medName= scanner.next();
             if(!isExistMedicine(medName)) {
 
                 String query = "Insert into medicine (Name) values ('" + medName + "');";
-                st.executeUpdate(query);
+                statement.executeUpdate(query);
             }
             String medIdquery="select id from medicine where name='"+medName+"';";
-            ResultSet resultSet=st.executeQuery(medIdquery);
+            ResultSet resultSet=statement.executeQuery(medIdquery);
             resultSet.next();
             int medicineid=resultSet.getInt(1);
             String getUserIdQuery="select userid from userdetails where email='"+email+"';";
-            resultSet=st.executeQuery(getUserIdQuery);
+            resultSet=statement.executeQuery(getUserIdQuery);
             resultSet.next();
             int patientid=resultSet.getInt(1);
             String Insertquery="insert into patientmedication (patientID,medicineId) values ("+patientid+","+medicineid+");";
-            st.executeUpdate(Insertquery);
+            statement.executeUpdate(Insertquery);
             System.out.println("  MEDICINE ADDED SUCCESSFULLY  ");
         }
         else{
@@ -197,37 +197,33 @@ public class Main {
         showOperations(role);
     }
 
-    private static boolean isExistMedicine(String s) throws SQLException, ClassNotFoundException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject", "root", "password");
-        Statement st = con.createStatement();
+    private static boolean isExistMedicine(String s) throws SQLException {
+        Statement statement = connection.createStatement();
         String checkMedicineQuery="select * from medicine where Name='"+s+"';";
-        ResultSet resultSet=st.executeQuery(checkMedicineQuery);
+        ResultSet resultSet=statement.executeQuery(checkMedicineQuery);
         return resultSet.next();
 
     }
 
-    private static boolean isExist(String email) throws SQLException, ClassNotFoundException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject", "root", "password");
-        Statement st = con.createStatement();
+    private static boolean isExist(String email) throws SQLException {
+        Statement statement = connection.createStatement();
         String getUserDetailsQuery="select * from userdetails where email='"+email+"';";
-        ResultSet resultSet=st.executeQuery(getUserDetailsQuery);
+        ResultSet resultSet=statement.executeQuery(getUserDetailsQuery);
         return resultSet.next();
     }
 
     private static void ViewDetails(String role) throws SQLException, ClassNotFoundException {
         int counter=1;
         boolean ispatient=true;
-        Class.forName("com.mysql.cj.jdbc.Driver");
+        
         Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject", "root", "password");
-        Statement st = con.createStatement();
+        Statement statement = con.createStatement();
         String query="select priority from role where roleName='"+role+"';";
-        ResultSet resultSet=st.executeQuery(query);
+        ResultSet resultSet=statement.executeQuery(query);
         resultSet.next();
         int loginPriority=resultSet.getInt("priority");
         String getRoleDetailsQuery="select * from role;";
-        resultSet=st.executeQuery(getRoleDetailsQuery);
+        resultSet=statement.executeQuery(getRoleDetailsQuery);
         while (resultSet.next())
         {   if(loginPriority<resultSet.getInt(2))
         {   ispatient=false;
@@ -239,24 +235,23 @@ public class Main {
         if(ispatient)
         {
             System.out.println("1.\t View Medication");
-            int choice=sc.nextInt();
+            int choice= scanner.nextInt();
             if(choice==1)
             {
                 viewMedication(role);
             }
         }
         System.out.println("Enter the role name");
-        String roleName=sc.next();
+        String roleName= scanner.next();
             printDetails(roleName,role);
     }
 
     private static void viewMedication(String role) throws SQLException, ClassNotFoundException {
         System.out.println("Enter Your userId");
-        int userid=sc.nextInt();
-        Connection con= DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject","root","password");
-        Statement st=con.createStatement();
+        int userid= scanner.nextInt();
+        Statement statement=connection.createStatement();
         String query="select * from (select * from patientmedication inner join medicine on patientmedication.medicineId=medicine.id) as T where patientID="+userid;
-        ResultSet resultSet=st.executeQuery(query);
+        ResultSet resultSet=statement.executeQuery(query);
         System.out.println("<<<<< MEDICATIONS >>>>>>>");
         while (resultSet.next())
         {
@@ -267,11 +262,9 @@ public class Main {
     }
 
     private static void printDetails(String role,String loginRole) throws SQLException, ClassNotFoundException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection con= DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject","root","password");
-        Statement st=con.createStatement();
+        Statement statement=connection.createStatement();
         String query="select * from userdetails where role='"+role+"';";
-        ResultSet resultSet=st.executeQuery(query);
+        ResultSet resultSet=statement.executeQuery(query);
         boolean isExist=false;
         while (resultSet.next())
         {
@@ -290,15 +283,13 @@ public class Main {
     }
 
     private static void addUser(String role) throws SQLException, ClassNotFoundException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection con= DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject","root","password");
-        Statement st=con.createStatement();
+        Statement statement=connection.createStatement();
         String query="select priority from role where roleName='"+role+"';";
-        ResultSet resultSet=st.executeQuery(query);
+        ResultSet resultSet=statement.executeQuery(query);
         resultSet.next();
         int loginPriority=resultSet.getInt(1);
         query="select * from role";
-        resultSet=st.executeQuery(query);
+        resultSet=statement.executeQuery(query);
         boolean isPatient=true;
         while(resultSet.next()){
             int priority=resultSet.getInt(2);
@@ -312,27 +303,27 @@ public class Main {
             System.out.println("You are not allowed to Add users");
             showOperations(role);
         }
-        sc=new Scanner(System.in);
-        String rolename=sc.next();
+        scanner =new Scanner(System.in);
+        String rolename= scanner.next();
         getUserDetails(rolename,role);
         }
 
     private static void getUserDetails(String role,String loginRole) throws SQLException, ClassNotFoundException {
         System.out.println("Enter Name");
-        sc=new Scanner(System.in);
-        String name=sc.next();
+        scanner =new Scanner(System.in);
+        String name= scanner.next();
         System.out.println("Enter email");
-        String email=sc.next();
+        String email= scanner.next();
         System.out.println("Enter password");
-        String password=sc.next();
+        String password= scanner.next();
         if(!isExist(email)) {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject", "root", "password");
-            Statement st = con.createStatement();
+            Statement statement = con.createStatement();
             String insertQuery = "INSERT INTO userdetails (name,role,email) VALUES ('" + name + "','" + role + "','" + email + "');";
-            st.executeUpdate(insertQuery);
+            statement.executeUpdate(insertQuery);
             insertQuery = "Insert into login (email,password) values ('" + email + "','" + password + "');";
-            st.executeUpdate(insertQuery);
+            statement.executeUpdate(insertQuery);
             System.out.println("<<<< USER ADDED SUCCESSFULLY >>>>>");
         }
         else {
@@ -342,17 +333,15 @@ public class Main {
     }
 
 
-    private static void addrole() throws ClassNotFoundException, SQLException {
-        sc=new Scanner(System.in);
+    private static void addrole() throws SQLException {
+        scanner =new Scanner(System.in);
         System.out.println("Enter the role");
-        String rolename=sc.next();
+        String rolename= scanner.next();
         System.out.println("Enter their priority");
-        int priority=sc.nextInt();
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection con= DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject","root","password");
-        Statement st=con.createStatement();
+        int priority= scanner.nextInt();
+        Statement statement=connection.createStatement();
         String insertQuery="insert into role (roleName,priority) values ('"+rolename+"',"+priority+");";
-        st.executeUpdate(insertQuery);
+        statement.executeUpdate(insertQuery);
 
     }
 }
