@@ -19,14 +19,15 @@ public class Main {
         String adminExistQuery="select * from userdetails where role=\"Admin\"";
         ResultSet r=statement.executeQuery(adminExistQuery);
         if(!r.next())
-        {   String clearUserDetails="delete from userdetails";
-            statement.executeUpdate(clearUserDetails);
+        {
             String clearRole="delete from role";
             statement.executeUpdate(clearRole);
             String clearLogin="delete from login";
             statement.executeUpdate(clearLogin);
             String clearMedicine="delete from medicine";
             statement.executeUpdate(clearMedicine);
+            String clearPatientMedication="delete from patientmedication";
+            statement.executeUpdate(clearPatientMedication);
             String setAutoIncrement="alter table userdetails AUTO_INCREMENT=1;";
             statement.executeUpdate(setAutoIncrement);
             setAutoIncrement="alter table login AUTO_INCREMENT=1;";
@@ -36,6 +37,7 @@ public class Main {
             greetAdmin();
         }
         initialOptions();
+        connection.close();
     }
 
     private static void greetAdmin() throws SQLException {
@@ -58,7 +60,6 @@ public class Main {
         statement.executeUpdate(insertLoginDetails);
         String insertRole="insert into role (roleName,priority) values ('Admin',1);";
         statement.executeUpdate(insertRole);
-        connection.close();
         for(int i=0;i<n;i++)
         {
             addrole();
@@ -77,7 +78,10 @@ public class Main {
         switch (choice) {
             case 1 -> showLoginDetails();
             case 2 -> showDatabase();
-            case 3->  System.exit(0);
+            case 3-> {
+                connection.close();
+                System.exit(0);
+            }
         }
     }
 
@@ -103,7 +107,6 @@ public class Main {
             System.out.println("DataBase is Empty");
             System.out.println("--------------------");
         }
-        connection.close();
         initialOptions();
     }
 
@@ -125,10 +128,8 @@ public class Main {
         String role = scanner.next();
         if (!LoginValidation()) {
             System.out.println("\n******<< Invalid login Credentials >>*******\n");
-            connection.close();
             showLoginDetails();
         }
-        connection.close();
         showOperations(role);
     }
 
@@ -207,7 +208,7 @@ public class Main {
 
     private static boolean isExist(String email) throws SQLException {
         Statement statement = connection.createStatement();
-        String getUserDetailsQuery="select * from userdetails where email='"+email+"';";
+        String getUserDetailsQuery="select * from userdetails where email='"+email+"' and role='patient';";
         ResultSet resultSet=statement.executeQuery(getUserDetailsQuery);
         return resultSet.next();
     }
@@ -216,8 +217,8 @@ public class Main {
         int counter=1;
         boolean ispatient=true;
         
-        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject", "root", "password");
-        Statement statement = con.createStatement();
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject", "root", "password");
+        Statement statement = connection.createStatement();
         String query="select priority from role where roleName='"+role+"';";
         ResultSet resultSet=statement.executeQuery(query);
         resultSet.next();
@@ -318,8 +319,8 @@ public class Main {
         String password= scanner.next();
         if(!isExist(email)) {
             
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject", "root", "password");
-            Statement statement = con.createStatement();
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject", "root", "password");
+            Statement statement = connection.createStatement();
             String insertQuery = "INSERT INTO userdetails (name,role,email) VALUES ('" + name + "','" + role + "','" + email + "');";
             statement.executeUpdate(insertQuery);
             insertQuery = "Insert into login (email,password) values ('" + email + "','" + password + "');";
