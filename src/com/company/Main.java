@@ -5,8 +5,9 @@ import java.util.Scanner;
 public class Main {
     static Scanner scanner;
     static Connection connection;
+    static Statement statement;
     
-
+    //open jdbc connection
     static {
         try {
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject","root","password");
@@ -15,7 +16,7 @@ public class Main {
         }
     }
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        Statement statement= connection.createStatement();
+        statement= connection.createStatement();
         String adminExistQuery="select * from userdetails where role=\"Admin\"";
         ResultSet r=statement.executeQuery(adminExistQuery);
         if(!r.next())
@@ -41,7 +42,7 @@ public class Main {
     }
 
     private static void greetAdmin() throws SQLException {
-        Statement statement= connection.createStatement();
+        statement= connection.createStatement();
         System.out.println("                    HOSPITAL MANAGEMENT SYSTEM");
         System.out.println("---------------------------------------------------------------------------");
         System.out.println();
@@ -86,7 +87,7 @@ public class Main {
     }
 
     private static void showDatabase() throws SQLException, ClassNotFoundException {
-        Statement statement= connection.createStatement();
+        statement= connection.createStatement();
         String getUserDetails="select * from userdetails;";
         ResultSet resultSet=statement.executeQuery(getUserDetails);
         System.out.println("              USER DATABASE");
@@ -115,7 +116,7 @@ public class Main {
         System.out.println("-------------------------------------------------");
         System.out.println();
         System.out.println("Login in as:\t");
-        Statement statement = connection.createStatement();
+        statement = connection.createStatement();
         String getRoleQuery = "select roleName from role;";
         ResultSet resultSet = statement.executeQuery(getRoleQuery);
         System.out.println("    AVAILABLE USERS  ");
@@ -169,7 +170,7 @@ public class Main {
 
     private static void addMedication(String role) throws SQLException, ClassNotFoundException {
         System.out.println("Enter Patient email");
-        Statement statement = connection.createStatement();
+        statement = connection.createStatement();
         String email= scanner.next();
         if(isExist(email))
         {
@@ -199,7 +200,7 @@ public class Main {
     }
 
     private static boolean isExistMedicine(String s) throws SQLException {
-        Statement statement = connection.createStatement();
+        statement = connection.createStatement();
         String checkMedicineQuery="select * from medicine where Name='"+s+"';";
         ResultSet resultSet=statement.executeQuery(checkMedicineQuery);
         return resultSet.next();
@@ -207,7 +208,7 @@ public class Main {
     }
 
     private static boolean isExist(String email) throws SQLException {
-        Statement statement = connection.createStatement();
+        statement = connection.createStatement();
         String getUserDetailsQuery="select * from userdetails where email='"+email+"' and role='patient';";
         ResultSet resultSet=statement.executeQuery(getUserDetailsQuery);
         return resultSet.next();
@@ -218,7 +219,7 @@ public class Main {
         boolean ispatient=true;
         
         Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject", "root", "password");
-        Statement statement = connection.createStatement();
+        statement = connection.createStatement();
         String query="select priority from role where roleName='"+role+"';";
         ResultSet resultSet=statement.executeQuery(query);
         resultSet.next();
@@ -250,7 +251,7 @@ public class Main {
     private static void viewMedication(String role) throws SQLException, ClassNotFoundException {
         System.out.println("Enter Your userId");
         int userid= scanner.nextInt();
-        Statement statement=connection.createStatement();
+        statement=connection.createStatement();
         String query="select * from (select * from patientmedication inner join medicine on patientmedication.medicineId=medicine.id) as T where patientID="+userid;
         ResultSet resultSet=statement.executeQuery(query);
         System.out.println("<<<<< MEDICATIONS >>>>>>>");
@@ -263,7 +264,7 @@ public class Main {
     }
 
     private static void printDetails(String role,String loginRole) throws SQLException, ClassNotFoundException {
-        Statement statement=connection.createStatement();
+        statement=connection.createStatement();
         String query="select * from userdetails where role='"+role+"';";
         ResultSet resultSet=statement.executeQuery(query);
         boolean isExist=false;
@@ -284,7 +285,7 @@ public class Main {
     }
 
     private static void addUser(String role) throws SQLException, ClassNotFoundException {
-        Statement statement=connection.createStatement();
+        statement=connection.createStatement();
         String query="select priority from role where roleName='"+role+"';";
         ResultSet resultSet=statement.executeQuery(query);
         resultSet.next();
@@ -318,9 +319,8 @@ public class Main {
         System.out.println("Enter password");
         String password= scanner.next();
         if(!isExist(email)) {
-            
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject", "root", "password");
-            Statement statement = connection.createStatement();
+
+            statement = connection.createStatement();
             String insertQuery = "INSERT INTO userdetails (name,role,email) VALUES ('" + name + "','" + role + "','" + email + "');";
             statement.executeUpdate(insertQuery);
             insertQuery = "Insert into login (email,password) values ('" + email + "','" + password + "');";
@@ -340,7 +340,7 @@ public class Main {
         String rolename= scanner.next();
         System.out.println("Enter their priority");
         int priority= scanner.nextInt();
-        Statement statement=connection.createStatement();
+        statement=connection.createStatement();
         String insertQuery="insert into role (roleName,priority) values ('"+rolename+"',"+priority+");";
         statement.executeUpdate(insertQuery);
 
