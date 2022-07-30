@@ -10,37 +10,36 @@ public class Patient {
     static Connection connection;
     static Statement statement;
     static Scanner scanner;
-    Patient() throws SQLException, ClassNotFoundException {
+
+    Patient(String email) throws SQLException, ClassNotFoundException {
         connection=Connect.ConnectDB();
         statement=connection.createStatement();
-        showOperations();
+        showOperations(email);
         connection.close();
     }
-    public void showOperations() throws SQLException, ClassNotFoundException {
+    public void showOperations(String email) throws SQLException, ClassNotFoundException {
         System.out.println("1.\tView Medication\n2.\tLOG OUT\n");
         System.out.println("Enter a number from the above choices");
-        Scanner scanner=new Scanner(System.in);
+        scanner=new Scanner(System.in);
         int choice = scanner.nextInt();
         switch (choice) {
-            case 1 -> viewMedication();
+            case 1 -> viewMedication(email);
             default -> {
-                System.out.println("*******<< LOGGED OUT >>*********");
-                Main.initialOptions();
+                Display.loggedOut();
+                return;
             }
         }
+        showOperations(email);
     }
 
-    private void viewMedication() throws SQLException, ClassNotFoundException {
-        System.out.println("Enter Your userId");
-        int userid= scanner.nextInt();
-        String query="select * from (select * from patientmedication inner join medicine on patientmedication.medicineId=medicine.id) as T where patientID="+userid;
+    private void viewMedication(String email) throws SQLException, ClassNotFoundException {
+        String query="select medicine.name from (patientmedication inner join medicine on patientmedication.medicineId=medicine.id inner join userdetails on patientmedication.patientId=userdetails.userid ) where email='"+email+"';";
         ResultSet resultSet=statement.executeQuery(query);
-        System.out.println("<<<<< MEDICATIONS >>>>>>>");
+        Display.medications();
         while (resultSet.next())
         {
             System.out.println("*\t"+resultSet.getString("name"));
         }
-        System.out.println("-------------------------------");
-        showOperations();
+        Display.LineBreak();
     }
 }

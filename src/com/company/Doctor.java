@@ -26,7 +26,7 @@ public class Doctor{
             case 1 -> addUser();
             case 2 -> ViewDetails();
             default -> {
-                System.out.println("*******<< LOGGED OUT >>*********");
+                Display.loggedOut();
                 return;
             }
         }
@@ -50,10 +50,10 @@ public class Doctor{
            PatientMedication.addPatientMedication(medicineId,patientId);
         }
         else{
-            System.out.println("****<< NO PATIENT FOUND >>****");
+            Display.noRecordsFound();
         }
     }
-    private void addUser() throws SQLException, ClassNotFoundException {
+    private void addUser() throws SQLException {
         String query="select priority from role where roleName='Doctor';";
         ResultSet resultSet=statement.executeQuery(query);
         resultSet.next();
@@ -76,17 +76,17 @@ public class Doctor{
         String email= scanner.next();
         System.out.println("Enter password");
         String password= scanner.next();
-        if(!DataBase.isExistEmail(email)) {
+        if(!DataBase.isExistEmail(email,roleName)) {
 
             statement = connection.createStatement();
             String insertQuery = "INSERT INTO userdetails (name,role,email) VALUES ('" + name + "','" + roleName + "','" + email + "');";
             statement.executeUpdate(insertQuery);
             insertQuery = "Insert into login (email,password) values ('" + email + "','" + password + "');";
             statement.executeUpdate(insertQuery);
-            System.out.println("<<<< USER ADDED SUCCESSFULLY >>>>>");
+            Display.userAdded();
         }
         else {
-            System.out.println("User already exists");
+            Display.userExists();
         }
     }
 

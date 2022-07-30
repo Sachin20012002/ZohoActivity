@@ -4,11 +4,12 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 public class Admin {
-    String name;
-    public Admin(String name) {
-        this.name=name;
+    public Admin(String name,String email,String password) throws SQLException {
+        new User(name, "Admin", email);
+        new Login(email, password);
+        new Role("Admin", 1);
     }
-    public static void addRole() throws SQLException {
+     void addRole() throws SQLException {
         Scanner scanner =new Scanner(System.in);
         System.out.println("Enter the role");
         String roleName= scanner.next();

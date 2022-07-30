@@ -1,6 +1,5 @@
 package com.company;
 
-import javax.swing.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -10,10 +9,10 @@ public class Connect {
 
     public static Connection ConnectDB(){
         try{
-            Class.forName("com.mysql.jdbc.Driver");
+            //Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject", "root", "password");
             return connection;
-        }catch(ClassNotFoundException | SQLException e){
+        }catch(SQLException e){
             System.out.println("Cannot connect to dataBase");
             return null;
         }
