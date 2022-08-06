@@ -9,27 +9,13 @@ public class Main {
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         connection=Connect.ConnectDB();
+        assert connection != null;
         statement = connection.createStatement();
-        String adminExistQuery = "select * from userdetails where role=\"Admin\"";
-        ResultSet r = statement.executeQuery(adminExistQuery);
+        ResultSet r = statement.executeQuery(Query.adminExistQuery);
         if (!r.next()) {
-            String clearRole = "delete from role";
-            statement.executeUpdate(clearRole);
-            String clearLogin = "delete from login";
-            statement.executeUpdate(clearLogin);
-            String clearMedicine = "delete from medicine";
-            statement.executeUpdate(clearMedicine);
-            String clearPatientMedication = "delete from patientmedication";
-            statement.executeUpdate(clearPatientMedication);
-            String setAutoIncrement = "alter table userdetails AUTO_INCREMENT=1;";
-            statement.executeUpdate(setAutoIncrement);
-            setAutoIncrement = "alter table login AUTO_INCREMENT=1;";
-            statement.executeUpdate(setAutoIncrement);
-            setAutoIncrement = "alter table medicine AUTO_INCREMENT=1;";
-            statement.executeUpdate(setAutoIncrement);
             greetAdmin();
         }
-        initialOptions();
+        mainPage();
         connection.close();
     }
 
@@ -47,8 +33,10 @@ public class Main {
         Admin admin = new Admin(name,email,password);
         System.out.println("How many roles we can have in our hospital, Apart from Doctor and Patient");
         int n = scanner.nextInt();
-        System.out.println("By default Admin will have a priority value of 1,\n" +
-                "and an user can create other users who's priority value is greater than his priority value\n");
+        System.out.println("""
+                By default Admin will have a priority value of 1,
+                and an user can create other users who's priority value is greater than his priority value
+                """);
         System.out.println("Patient role will have the last priority value\n");
         System.out.println("Please enter Doctor's priority value");
         int p= scanner.nextInt();
@@ -62,7 +50,7 @@ public class Main {
 
     }
 
-    public static void initialOptions() throws SQLException, ClassNotFoundException {
+    public static void mainPage() throws SQLException, ClassNotFoundException {
         Display.hospitalManagementSystem();
         System.out.println("1.\tLogin Page\n2.\tDatabase\n3.\tEND");
         scanner = new Scanner(System.in);
@@ -75,7 +63,7 @@ public class Main {
                 return;
             }
         }
-        initialOptions();
+        mainPage();
     }
 }
 

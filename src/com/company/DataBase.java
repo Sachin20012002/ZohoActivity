@@ -76,4 +76,24 @@ public class DataBase {
         connection.close();
         return flag;
     }
+
+ /*  use this part of code only to clear your database when needed
+  private static void clearAllTables() throws SQLException {
+        connection=Connect.ConnectDB();
+        assert connection != null;
+        Statement statement = connection.createStatement();
+        statement.executeUpdate(Query.clearuserdetails);
+        statement.executeUpdate(Query.clearRole);
+        statement.executeUpdate(Query.clearLogin);
+        statement.executeUpdate(Query.clearMedicine);
+        statement.executeUpdate(Query.clearPatientMedication);
+        statement.executeUpdate(Query.setAutoIncrementuserdetails);
+        statement.executeUpdate(Query.setAutoIncrementlogin);
+        statement.executeUpdate(Query.setAutoIncrementmedicine);
+    }
+
+    public static void main(String[] args) throws SQLException {
+        clearAllTables();
+    }
+ */
 }

@@ -1,21 +1,18 @@
 package com.company;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashSet;
 import java.util.Scanner;
 
-
 public class Login {
+    PreparedStatement statement;
 
     Login(String email, String password) throws SQLException {
-        Connection con=Connect.ConnectDB();
-        Statement statement;
-        statement= con.createStatement();
-        String insertLoginDetails="Insert into login (email,password) values ('"+email+"','"+password+"');";
-        statement.executeUpdate(insertLoginDetails);
+        Connection connection=Connect.ConnectDB();
+        statement= connection.prepareStatement(Query.insertLoginDetails);
+        statement.setString(1,email);
+        statement.setString(2,password);
+        statement.executeUpdate();
     }
 
     static void showLoginDetails() throws SQLException, ClassNotFoundException {
@@ -26,8 +23,7 @@ public class Login {
         System.out.println();
         System.out.println("Login in as:\t");
         statement = connection.createStatement();
-        String getRoleQuery = "select distinct role from userdetails;";
-        ResultSet resultSet = statement.executeQuery(getRoleQuery);
+        ResultSet resultSet = statement.executeQuery(Query.getRoleQuery);
         Display.availableUsers();
         HashSet<String> roleSet=new HashSet<>();
         while (resultSet.next()) {
