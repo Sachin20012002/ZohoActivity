@@ -1,6 +1,6 @@
 package com.company;
 
-public class Display {
+public class Design {
 
     public static void databaseHeading() {
         System.out.println("---------------------------------------------");

@@ -7,44 +7,60 @@ import java.util.Scanner;
 public class User {
     static Connection connection;
     static Statement statement;
+    static PreparedStatement preparedStatement;
+    static Scanner scanner;
+    public User() throws SQLException {
+        connection=Connect.ConnectDB();
+        assert connection != null;
+        statement=connection.createStatement();
+    }
     public User(String name,String role,String email) throws SQLException {
         connection=Connect.ConnectDB();
-        PreparedStatement statement= connection.prepareStatement("Insert into userdetails (name,role,email) values (?,?,?)");
-        statement.setString(1,name);
-        statement.setString(2,role);
-        statement.setString(3,email);
-        statement.executeUpdate();
+        assert connection != null;
+        preparedStatement= connection.prepareStatement(Query.insertIntoUserDetails);
+        preparedStatement.setString(1,name);
+        preparedStatement.setString(2,role);
+        preparedStatement.setString(3,email);
+        preparedStatement.executeUpdate();
         connection.close();
     }
-    public User(String role) throws SQLException, ClassNotFoundException {
-        connection=Connect.ConnectDB();
-        statement=connection.createStatement();
+    public User(String role) throws SQLException{
+        new User();
         showOperations(role);
         connection.close();
     }
-    private void showOperations(String role) throws SQLException, ClassNotFoundException {
-        Scanner scanner=new Scanner(System.in);
+
+
+    private void showOperations(String role) throws SQLException {
+        scanner=new Scanner(System.in);
             System.out.println("1.\tADD USER\n2.\tVIEW DETAILS\n3.\tLOG OUT\n");
             System.out.println("Enter a number from the above choices");
-            int choice = scanner.nextInt();
+            int choice;
+            try {
+                choice = scanner.nextInt();
+            }
+            catch (Exception e){
+                System.out.println("Please Enter Valid Number");
+                showOperations(role);
+                return;
+            }
             switch (choice) {
                 case 1 -> addUser(role);
                 case 2 -> ViewDetails(role);
                 default -> {
-                    Display.loggedOut();
+                    Design.loggedOut();
                     return;
                 }
             }
             showOperations(role);
         }
-    private void addUser(String role) throws SQLException {
-        String query="select priority from role where roleName='"+role+"';";
-        ResultSet resultSet=statement.executeQuery(query);
+
+        void addUser(String role) throws SQLException {
+        ResultSet resultSet=statement.executeQuery(Query.getPriority(role));
         resultSet.next();
         int loginPriority=resultSet.getInt(1);
-        query="select * from role";
-        resultSet=statement.executeQuery(query);
-        Display.availableRoles();
+        resultSet=statement.executeQuery(Query.selectAllFromRole);
+        Design.availableRoles();
         HashSet<String> roleSet=new HashSet<>();
         while(resultSet.next()){
             int priority=resultSet.getInt(2);
@@ -54,42 +70,46 @@ public class User {
                 System.out.println("*\t"+currRole);
             }
         }
-        Scanner scanner =new Scanner(System.in);
+        scanner =new Scanner(System.in);
         System.out.println("ENTER THE ROLE NAME");
-        String roleName= scanner.next();
+        String roleName= scanner.nextLine();
         if(!roleSet.contains(roleName)){
-            Display.notAvailable();
+            Design.notAvailable();
             addUser(role);
+            return;
         }
         System.out.println("Enter Name");
         scanner =new Scanner(System.in);
-        String name= scanner.next();
+        String name= scanner.nextLine();
         System.out.println("Enter email");
-        String email= scanner.next();
+        String email= scanner.nextLine();
         System.out.println("Enter password");
-        String password= scanner.next();
-        if(!DataBase.isExistUser(email,role)) {
+        String password= scanner.nextLine();
+        if(!DataBase.isExistUser(email,roleName)) {
 
-            statement = connection.createStatement();
-            String insertQuery = "INSERT INTO userdetails (name,role,email) VALUES ('" + name + "','" + roleName + "','" + email + "');";
-            statement.executeUpdate(insertQuery);
-            insertQuery = "Insert into login (email,password) values ('" + email + "','" + password + "');";
-            statement.executeUpdate(insertQuery);
-            Display.userAdded();
+            preparedStatement = connection.prepareStatement(Query.insertIntoUserDetails);
+            preparedStatement.setString(1,name);
+            preparedStatement.setString(2,roleName);
+            preparedStatement.setString(3,email);
+            preparedStatement.executeUpdate();
+            preparedStatement=connection.prepareStatement(Query.insertLoginDetails);
+            preparedStatement.setString(1,email);
+            preparedStatement.setString(2,password);
+            preparedStatement.executeUpdate();
+            Design.userAdded();
         }
         else {
-            Display.userExists();
+            Design.userExists();
         }
     }
-    private void ViewDetails(String role) throws SQLException{
+
+     void ViewDetails(String role) throws SQLException{
         int counter=1;
         Scanner scanner=new Scanner(System.in);
-        String query="select priority from role where roleName='"+role+"';";
-        ResultSet resultSet=statement.executeQuery(query);
+        ResultSet resultSet=statement.executeQuery(Query.getPriority(role));
         resultSet.next();
         int loginPriority=resultSet.getInt("priority");
-        String getRoleDetailsQuery="select * from role;";
-        resultSet=statement.executeQuery(getRoleDetailsQuery);
+        resultSet=statement.executeQuery(Query.selectAllFromRole);
         while (resultSet.next())
         {   if(loginPriority<resultSet.getInt(2))
            {
@@ -98,14 +118,11 @@ public class User {
            }
         }
         System.out.println("Enter the role name");
-        String roleName= scanner.next();
+        String roleName= scanner.nextLine();
         DataBase.printDetails(roleName);
     }
     public static int getUserId(String email) throws SQLException {
-        Connection con=Connect.ConnectDB();
-        Statement statement= con.createStatement();
-        String getUserIdQuery="select userid from userdetails where email='"+email+"';";
-        ResultSet resultSet=statement.executeQuery(getUserIdQuery);
+        ResultSet resultSet=statement.executeQuery(Query.getUserId(email));
         resultSet.next();
         return resultSet.getInt(1);
     }

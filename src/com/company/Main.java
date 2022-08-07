@@ -7,7 +7,7 @@ public class Main {
     static Connection connection;
     static Statement statement;
 
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+    public static void main(String[] args) throws SQLException{
         connection=Connect.ConnectDB();
         assert connection != null;
         statement = connection.createStatement();
@@ -20,8 +20,8 @@ public class Main {
     }
 
     private static void greetAdmin() throws SQLException {
-        Display.hospitalManagementSystem();
-        Display.welcomeAdmin();
+        Design.hospitalManagementSystem();
+        Design.welcomeAdmin();
         scanner = new Scanner(System.in);
         System.out.println("Let us create your userLogin");
         System.out.println("Enter your Name");
@@ -50,14 +50,14 @@ public class Main {
 
     }
 
-    public static void mainPage() throws SQLException, ClassNotFoundException {
-        Display.hospitalManagementSystem();
+    public static void mainPage() throws SQLException {
+        Design.hospitalManagementSystem();
         System.out.println("1.\tLogin Page\n2.\tDatabase\n3.\tEND");
         scanner = new Scanner(System.in);
         int choice = scanner.nextInt();
         switch (choice) {
             case 1 -> Login.showLoginDetails();
-            case 2 -> DataBase.showDatabase();
+            case 2 -> DataBase.showOperations();
             case 3 -> {
                 System.out.println("Thank You :)");
                 return;
@@ -66,5 +66,3 @@ public class Main {
         mainPage();
     }
 }
-
-

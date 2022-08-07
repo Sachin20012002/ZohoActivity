@@ -1,30 +1,32 @@
 package com.company;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class Medicine {
-    public Medicine(String medName) throws SQLException {
-        Connection connection=Connect.ConnectDB();
-        Statement statement = connection.createStatement();
-        String query = "Insert into medicine (Name) values ('" + medName + "');";
-        statement.executeUpdate(query);
+    static Connection connection;
+    static Statement statement;
+    static PreparedStatement preparedStatement;
+
+    public static void addMedicine(String medName) throws SQLException {
+        connection=Connect.ConnectDB();
+        assert connection != null;
+        preparedStatement = connection.prepareStatement(Query.insertIntoMedicine);
+        preparedStatement.setString(1,medName);
+        preparedStatement.executeUpdate();
     }
     public static int getMedicineId(String medName) throws SQLException {
-        Connection connection=Connect.ConnectDB();
-        Statement statement = connection.createStatement();
-        String medIdquery="select id from medicine where name='"+medName+"';";
-        ResultSet resultSet=statement.executeQuery(medIdquery);
+        connection=Connect.ConnectDB();
+        assert connection != null;
+        statement = connection.createStatement();
+        ResultSet resultSet=statement.executeQuery(Query.getMedID(medName));
         resultSet.next();
         return resultSet.getInt(1);
     }
-    public static boolean isExistMedicine(String s) throws SQLException {
-        Connection connection=Connect.ConnectDB();
+    public static boolean isExistMedicine(String medName) throws SQLException {
+        connection=Connect.ConnectDB();
+        assert connection != null;
         Statement statement = connection.createStatement();
-        String checkMedicineQuery="select * from medicine where Name='"+s+"';";
-        ResultSet resultSet=statement.executeQuery(checkMedicineQuery);
+        ResultSet resultSet=statement.executeQuery(Query.checkMedicineQuery(medName));
         return resultSet.next();
 
     }

@@ -1,15 +1,17 @@
 package com.company;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class PatientMedication {
     public static void addPatientMedication(int medicineId, int patientId) throws SQLException {
         Connection connection=Connect.ConnectDB();
-        Statement statement=connection.createStatement();
-        String Insertquery="insert into patientmedication (patientID,medicineId) values ("+patientId+","+medicineId+");";
-        statement.executeUpdate(Insertquery);
+        assert connection!=null;
+        PreparedStatement preparedStatement=connection.prepareStatement(Query.insertPatientMedication);
+        preparedStatement.setInt(1,patientId);
+        preparedStatement.setInt(2,medicineId);
+        preparedStatement.executeUpdate();
         System.out.println("  MEDICINE ADDED SUCCESSFULLY  ");
     }
 }

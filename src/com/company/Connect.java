@@ -5,12 +5,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Connect {
-    Connection con=null;
 
+    static Connection connection=null;
     public static Connection ConnectDB(){
         try{
             //Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/zohoProject", "root", "password");
+            connection = DriverManager.getConnection(DataBase.DataBaseURL, DataBase.Username, DataBase.Password);
             return connection;
         }catch(SQLException e){
             System.out.println("Cannot connect to dataBase");

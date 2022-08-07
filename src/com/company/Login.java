@@ -5,26 +5,31 @@ import java.util.HashSet;
 import java.util.Scanner;
 
 public class Login {
-    PreparedStatement statement;
+    static PreparedStatement preparedStatement;
+    static Connection connection;
+    static Statement statement;
+    static Scanner scanner;
 
-    Login(String email, String password) throws SQLException {
+    static void addLogin(String email, String password) throws SQLException {
         Connection connection=Connect.ConnectDB();
-        statement= connection.prepareStatement(Query.insertLoginDetails);
-        statement.setString(1,email);
-        statement.setString(2,password);
-        statement.executeUpdate();
+        assert connection != null;
+        preparedStatement= connection.prepareStatement(Query.insertLoginDetails);
+        preparedStatement.setString(1,email);
+        preparedStatement.setString(2,password);
+        preparedStatement.executeUpdate();
+        connection.close();
     }
 
-    static void showLoginDetails() throws SQLException, ClassNotFoundException {
-        Connection connection=Connect.ConnectDB();
-        Statement statement;
-        Scanner scanner=new Scanner(System.in);
-        Display.loginPage();
+    static void showLoginDetails() throws SQLException {
+        connection=Connect.ConnectDB();
+        scanner=new Scanner(System.in);
+        Design.loginPage();
         System.out.println();
         System.out.println("Login in as:\t");
+        assert connection != null;
         statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(Query.getRoleQuery);
-        Display.availableUsers();
+        Design.availableUsers();
         HashSet<String> roleSet=new HashSet<>();
         while (resultSet.next()) {
             String currRole=resultSet.getString("role");
@@ -33,16 +38,18 @@ public class Login {
         }
         System.out.println();
         System.out.println("ENTER ROLE NAME");
-        String role = scanner.next();
+        String role = scanner.nextLine();
         if(!roleSet.contains(role)){
             System.out.println("User not Available");
             showLoginDetails();
+            return;
         }
         System.out.println("Enter your email");
-        String email= scanner.next();
+        String email= scanner.nextLine();
         if (!LoginValidation(role,email)) {
-            Display.invalidLogin();
+            Design.invalidLogin();
             showLoginDetails();
+            return;
         }
         if(role.equals("Patient")){
             new Patient(email);
@@ -55,12 +62,13 @@ public class Login {
     }
 
     private static boolean LoginValidation(String role,String email) throws SQLException {
-        Connection connection=Connect.ConnectDB();
-        Scanner scanner=new Scanner(System.in);
+        connection=Connect.ConnectDB();
+        assert connection != null;
+        statement= connection.createStatement();
+        scanner=new Scanner(System.in);
         System.out.println("Enter your password");
-        String password= scanner.next();
-        Statement statement= connection.createStatement();
-        String str="select password from login inner join userdetails on login.email=userdetails.email where login.email='"+email+"' and role='"+role+"';";
+        String password= scanner.nextLine();
+        String str=Query.getPassword(role,email);
         ResultSet r=statement.executeQuery(str);
         if(r.next())
         {
