@@ -1,34 +1,28 @@
 package com.company;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
 
 public class Login {
-    static PreparedStatement preparedStatement;
-    static Connection connection;
-    static Statement statement;
     static Scanner scanner;
 
     static void addLogin(String email, String password) throws SQLException {
-        Connection connection=Connect.ConnectDB();
-        assert connection != null;
-        preparedStatement= connection.prepareStatement(Query.insertLoginDetails);
+        DConnect db=new DConnect();
+        PreparedStatement preparedStatement=db.getPreparedStatement(Query.insertLoginDetails);
         preparedStatement.setString(1,email);
         preparedStatement.setString(2,password);
-        preparedStatement.executeUpdate();
-        connection.close();
+        db.executeUpdate(preparedStatement);
     }
 
     static void showLoginDetails() throws SQLException {
-        connection=Connect.ConnectDB();
+        DConnect db=new DConnect();
         scanner=new Scanner(System.in);
         Design.loginPage();
         System.out.println();
         System.out.println("Login in as:\t");
-        assert connection != null;
-        statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(Query.getRoleQuery);
+        ResultSet resultSet = db.executeQuery(Query.getRoleQuery);
         Design.availableUsers();
         HashSet<String> roleSet=new HashSet<>();
         while (resultSet.next()) {
@@ -62,14 +56,11 @@ public class Login {
     }
 
     private static boolean LoginValidation(String role,String email) throws SQLException {
-        connection=Connect.ConnectDB();
-        assert connection != null;
-        statement= connection.createStatement();
+        DConnect db=new DConnect();
         scanner=new Scanner(System.in);
         System.out.println("Enter your password");
         String password= scanner.nextLine();
-        String str=Query.getPassword(role,email);
-        ResultSet r=statement.executeQuery(str);
+        ResultSet r=db.executeQuery(Query.getPassword(role,email));
         if(r.next())
         {
             return r.getString("password").equals(password);

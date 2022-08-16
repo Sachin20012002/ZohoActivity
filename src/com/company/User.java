@@ -5,29 +5,21 @@ import java.util.HashSet;
 import java.util.Scanner;
 
 public class User {
-    static Connection connection;
-    static Statement statement;
-    static PreparedStatement preparedStatement;
+
     static Scanner scanner;
-    public User() throws SQLException {
-        connection=Connect.ConnectDB();
-        assert connection != null;
-        statement=connection.createStatement();
-    }
     public User(String name,String role,String email) throws SQLException {
-        connection=Connect.ConnectDB();
-        assert connection != null;
-        preparedStatement= connection.prepareStatement(Query.insertIntoUserDetails);
+        DConnect db=new DConnect();
+        PreparedStatement preparedStatement= db.getPreparedStatement(Query.insertIntoUserDetails);
         preparedStatement.setString(1,name);
         preparedStatement.setString(2,role);
         preparedStatement.setString(3,email);
-        preparedStatement.executeUpdate();
-        connection.close();
+        db.executeUpdate(preparedStatement);
     }
     public User(String role) throws SQLException{
-        new User();
         showOperations(role);
-        connection.close();
+    }
+
+    public User() {
     }
 
 
@@ -56,10 +48,11 @@ public class User {
         }
 
         void addUser(String role) throws SQLException {
-        ResultSet resultSet=statement.executeQuery(Query.getPriority(role));
+        DConnect db=new DConnect();
+        ResultSet resultSet=db.executeQuery(Query.getPriority(role));
         resultSet.next();
         int loginPriority=resultSet.getInt(1);
-        resultSet=statement.executeQuery(Query.selectAllFromRole);
+        resultSet=db.executeQuery(Query.selectAllFromRole);
         Design.availableRoles();
         HashSet<String> roleSet=new HashSet<>();
         while(resultSet.next()){
@@ -87,15 +80,15 @@ public class User {
         String password= scanner.nextLine();
         if(!DataBase.isExistUser(email,roleName)) {
 
-            preparedStatement = connection.prepareStatement(Query.insertIntoUserDetails);
+            PreparedStatement preparedStatement = db.getPreparedStatement(Query.insertIntoUserDetails);
             preparedStatement.setString(1,name);
             preparedStatement.setString(2,roleName);
             preparedStatement.setString(3,email);
-            preparedStatement.executeUpdate();
-            preparedStatement=connection.prepareStatement(Query.insertLoginDetails);
+            db.executeUpdate(preparedStatement);
+            preparedStatement=db.getPreparedStatement(Query.insertLoginDetails);
             preparedStatement.setString(1,email);
             preparedStatement.setString(2,password);
-            preparedStatement.executeUpdate();
+            db.executeUpdate(preparedStatement);
             Design.userAdded();
         }
         else {
@@ -104,12 +97,13 @@ public class User {
     }
 
      void ViewDetails(String role) throws SQLException{
+        DConnect db=new DConnect();
         int counter=1;
         Scanner scanner=new Scanner(System.in);
-        ResultSet resultSet=statement.executeQuery(Query.getPriority(role));
+        ResultSet resultSet=db.executeQuery(Query.getPriority(role));
         resultSet.next();
         int loginPriority=resultSet.getInt("priority");
-        resultSet=statement.executeQuery(Query.selectAllFromRole);
+        resultSet=db.executeQuery(Query.selectAllFromRole);
         while (resultSet.next())
         {   if(loginPriority<resultSet.getInt(2))
            {
@@ -122,7 +116,8 @@ public class User {
         DataBase.printDetails(roleName);
     }
     public static int getUserId(String email) throws SQLException {
-        ResultSet resultSet=statement.executeQuery(Query.getUserId(email));
+        DConnect db=new DConnect();
+        ResultSet resultSet=db.executeQuery(Query.getUserId(email));
         resultSet.next();
         return resultSet.getInt(1);
     }

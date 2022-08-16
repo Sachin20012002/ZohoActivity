@@ -8,6 +8,7 @@ public class Query {
     static String getDetailsOfRole="select * from userdetails where role=?;";
     static String getUserDetailsQuery="select * from userdetails where email=? and role=?;";
     static String selectAllFromRole="select * from role";
+    static String selectAllFromUserDetails="select * from userdetails";
     static String insertLoginDetails="Insert into login (email,password) values (?,?);";
     static String insertIntoUserDetails = "INSERT INTO userdetails (name,role,email) VALUES (?,?,?);";
     static String insertIntoMedicine = "Insert into medicine (Name) values (?);";

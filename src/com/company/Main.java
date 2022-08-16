@@ -4,19 +4,14 @@ import java.util.Scanner;
 
 public class Main {
     static Scanner scanner;
-    static Connection connection;
-    static Statement statement;
 
     public static void main(String[] args) throws SQLException{
-        connection=Connect.ConnectDB();
-        assert connection != null;
-        statement = connection.createStatement();
-        ResultSet r = statement.executeQuery(Query.adminExistQuery);
+        DConnect db=new DConnect();
+        ResultSet r = db.executeQuery(Query.adminExistQuery);
         if (!r.next()) {
             greetAdmin();
         }
         mainPage();
-        connection.close();
     }
 
     private static void greetAdmin() throws SQLException {

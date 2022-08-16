@@ -8,7 +8,6 @@ public class Doctor extends User{
     Doctor() throws SQLException {
         super();
         showOperations();
-        connection.close();
     }
     private void showOperations() throws SQLException {
         System.out.println("0.\tADD MEDICATION\n1.\tADD USER\n2.\tVIEW DETAILS\n3.\tLOG OUT\n");
@@ -35,9 +34,6 @@ public class Doctor extends User{
         showOperations();
     }
     private void addMedication() throws SQLException {
-        Connection connection=Connect.ConnectDB();
-        assert connection != null;
-        statement=connection.createStatement();
         scanner=new Scanner(System.in);
         System.out.println("Enter Patient email");
         String email= scanner.nextLine();

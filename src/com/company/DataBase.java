@@ -4,12 +4,9 @@ import java.sql.*;
 import java.util.Scanner;
 
 public class DataBase {
-    static Connection connection;
     static Scanner scanner;
-    static PreparedStatement preparedStatement;
-    static String DataBaseURL="jdbc:mysql://localhost:3306/zohoProject";
-    static String Username="root";
-    static String Password="password";
+
+
 
     public static void showOperations() throws SQLException {
         System.out.println("1.\tShow DataBase\n2.\tClear DataBase\n3.\tGo Back\n");
@@ -36,11 +33,8 @@ public class DataBase {
     }
 
     static void showDatabase() throws SQLException {
-        connection=Connect.ConnectDB();
-        String getUserDetails="select * from userdetails;";
-        assert connection != null;
-        preparedStatement= connection.prepareStatement(getUserDetails);
-        ResultSet resultSet=preparedStatement.executeQuery();
+        DConnect db=new DConnect();
+        ResultSet resultSet=db.executeQuery(Query.selectAllFromUserDetails);
         Design.databaseHeading();
         boolean isExist=false;
         while (resultSet.next()){
@@ -53,19 +47,16 @@ public class DataBase {
             System.out.println("UserId:\t"+userid+"\nName:\t"+name+"\nEmail:\t"+email+"\nRole:\t"+role);
             Design.LineBreak();
         }
-        if(!isExist)
-        {
+        if(!isExist) {
             Design.databaseEmpty();
         }
-        connection.close();
     }
 
     static void printDetails(String role) throws SQLException {
-        connection=Connect.ConnectDB();
-        assert connection != null;
-        preparedStatement=connection.prepareStatement(Query.getDetailsOfRole);
+        DConnect db=new DConnect();
+        PreparedStatement preparedStatement= db.getPreparedStatement(Query.getDetailsOfRole);
         preparedStatement.setString(1,role);
-        ResultSet resultSet=preparedStatement.executeQuery();
+        ResultSet resultSet= db.executeQuery(preparedStatement);
         boolean isExist=false;
         while (resultSet.next())
         {
@@ -81,32 +72,26 @@ public class DataBase {
         {
             Design.noRecordsFound();
         }
-        connection.close();
     }
 
     static boolean isExistUser(String email,String role) throws SQLException {
-        connection=Connect.ConnectDB();
-        assert connection != null;
-        preparedStatement= connection.prepareStatement(Query.getUserDetailsQuery);
+        DConnect db=new DConnect();
+        PreparedStatement preparedStatement= db.getPreparedStatement(Query.getUserDetailsQuery);
         preparedStatement.setString(1,email);
         preparedStatement.setString(2,role);
-        ResultSet resultSet=preparedStatement.executeQuery();
-        boolean flag=resultSet.next();
-        connection.close();
-        return flag;
+        ResultSet resultSet= db.executeQuery(preparedStatement);
+        return resultSet.next();
     }
 
-  private static void clearAllTables() throws SQLException {
-        connection=Connect.ConnectDB();
-        assert connection != null;
-        Statement statement = connection.createStatement();
-        statement.executeUpdate(Query.clearuserdetails);
-        statement.executeUpdate(Query.clearRole);
-        statement.executeUpdate(Query.clearLogin);
-        statement.executeUpdate(Query.clearMedicine);
-        statement.executeUpdate(Query.clearPatientMedication);
-        statement.executeUpdate(Query.setAutoIncrementuserdetails);
-        statement.executeUpdate(Query.setAutoIncrementlogin);
-        statement.executeUpdate(Query.setAutoIncrementmedicine);
+  private static void clearAllTables() {
+        DConnect db=new DConnect();
+        db.executeUpdate(Query.clearuserdetails);
+        db.executeUpdate(Query.clearRole);
+        db.executeUpdate(Query.clearLogin);
+        db.executeUpdate(Query.clearMedicine);
+        db.executeUpdate(Query.clearPatientMedication);
+        db.executeUpdate(Query.setAutoIncrementuserdetails);
+        db.executeUpdate(Query.setAutoIncrementlogin);
+        db.executeUpdate(Query.setAutoIncrementmedicine);
     }
 }
