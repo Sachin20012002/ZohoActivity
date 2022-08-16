@@ -24,28 +24,21 @@ public class DConnect {
         {
             openConnection();
             resultSet=statement.executeQuery(query);
-            return  resultSet;
         }
         catch(SQLException e)
         {
             e.printStackTrace();
         }
-        finally {
-            closeConnection();
-        }
+
         return resultSet;
     }
     ResultSet executeQuery(PreparedStatement preparedStatement) {
         try {
             openConnection();
             resultSet = preparedStatement.executeQuery();
-            return resultSet;
         }
         catch (SQLException e){
             e.printStackTrace();
-        }
-        finally {
-            closeConnection();
         }
         return resultSet;
     }
@@ -65,7 +58,7 @@ public class DConnect {
     void executeUpdate(PreparedStatement preparedStatement) {
         try {
             openConnection();
-            preparedStatement.executeQuery();
+            preparedStatement.executeUpdate();
         }
         catch (SQLException e){
             e.printStackTrace();
@@ -75,6 +68,7 @@ public class DConnect {
         }
     }
     PreparedStatement getPreparedStatement(String query) throws SQLException {
+        openConnection();
         return connection.prepareStatement(query);
     }
 

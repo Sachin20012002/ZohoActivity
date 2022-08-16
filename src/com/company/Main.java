@@ -9,6 +9,7 @@ public class Main {
         DConnect db=new DConnect();
         ResultSet r = db.executeQuery(Query.adminExistQuery);
         if (!r.next()) {
+            db.closeConnection();
             greetAdmin();
         }
         mainPage();

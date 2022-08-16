@@ -23,7 +23,11 @@ public class DataBase {
         }
         switch (choice) {
             case 1 -> showDatabase();
-            case 2 -> clearAllTables();
+            case 2 -> {
+                clearAllTables();
+                System.out.println("The Database is cleared\n Thank You");
+                System.exit(1);
+            }
             default -> {
                 Design.loggedOut();
                 return;
