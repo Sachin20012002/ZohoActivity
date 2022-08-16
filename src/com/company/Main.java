@@ -6,7 +6,7 @@ public class Main {
     static Scanner scanner;
 
     public static void main(String[] args) throws SQLException{
-        DConnect db=new DConnect();
+        JDBC db=JDBC.getInstance();
         ResultSet r = db.executeQuery(Query.adminExistQuery);
         if (!r.next()) {
             db.closeConnection();

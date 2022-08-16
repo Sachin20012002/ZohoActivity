@@ -1,7 +1,6 @@
 package com.company;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Scanner;
 
@@ -9,7 +8,7 @@ public class Login {
     static Scanner scanner;
 
     static void addLogin(String email, String password) throws SQLException {
-        DConnect db=new DConnect();
+        JDBC db=JDBC.getInstance();
         PreparedStatement preparedStatement=db.getPreparedStatement(Query.insertLoginDetails);
         preparedStatement.setString(1,email);
         preparedStatement.setString(2,password);
@@ -17,7 +16,7 @@ public class Login {
     }
 
     static void showLoginDetails() throws SQLException {
-        DConnect db=new DConnect();
+        JDBC db=JDBC.getInstance();
         scanner=new Scanner(System.in);
         Design.loginPage();
         System.out.println();
@@ -56,7 +55,7 @@ public class Login {
     }
 
     private static boolean LoginValidation(String role,String email) throws SQLException {
-        DConnect db=new DConnect();
+        JDBC db=JDBC.getInstance();
         scanner=new Scanner(System.in);
         System.out.println("Enter your password");
         String password= scanner.nextLine();

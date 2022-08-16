@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class PatientMedication {
     public static void addPatientMedication(int medicineId, int patientId) throws SQLException {
-        DConnect db=new DConnect();
+        JDBC db=JDBC.getInstance();
         PreparedStatement preparedStatement=db.getPreparedStatement(Query.insertPatientMedication);
         preparedStatement.setInt(1,patientId);
         preparedStatement.setInt(2,medicineId);

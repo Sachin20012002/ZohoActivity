@@ -6,8 +6,6 @@ import java.util.Scanner;
 public class DataBase {
     static Scanner scanner;
 
-
-
     public static void showOperations() throws SQLException {
         System.out.println("1.\tShow DataBase\n2.\tClear DataBase\n3.\tGo Back\n");
         System.out.println("Enter a number from the above choices");
@@ -37,7 +35,7 @@ public class DataBase {
     }
 
     static void showDatabase() throws SQLException {
-        DConnect db=new DConnect();
+        JDBC db=JDBC.getInstance();
         ResultSet resultSet=db.executeQuery(Query.selectAllFromUserDetails);
         Design.databaseHeading();
         boolean isExist=false;
@@ -57,7 +55,7 @@ public class DataBase {
     }
 
     static void printDetails(String role) throws SQLException {
-        DConnect db=new DConnect();
+        JDBC db=JDBC.getInstance();
         PreparedStatement preparedStatement= db.getPreparedStatement(Query.getDetailsOfRole);
         preparedStatement.setString(1,role);
         ResultSet resultSet= db.executeQuery(preparedStatement);
@@ -79,7 +77,7 @@ public class DataBase {
     }
 
     static boolean isExistUser(String email,String role) throws SQLException {
-        DConnect db=new DConnect();
+        JDBC db=JDBC.getInstance();
         PreparedStatement preparedStatement= db.getPreparedStatement(Query.getUserDetailsQuery);
         preparedStatement.setString(1,email);
         preparedStatement.setString(2,role);
@@ -88,7 +86,7 @@ public class DataBase {
     }
 
   private static void clearAllTables() {
-        DConnect db=new DConnect();
+        JDBC db=JDBC.getInstance();
         db.executeUpdate(Query.clearuserdetails);
         db.executeUpdate(Query.clearRole);
         db.executeUpdate(Query.clearLogin);

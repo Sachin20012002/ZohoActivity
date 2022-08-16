@@ -2,27 +2,39 @@ package com.company;
 
 import java.sql.*;
 
-public class DConnect {
-    String DataBaseURL="jdbc:mysql://localhost:3306/zohoProject";
+
+//SINGLETON CLASS
+public class JDBC {
+    private static JDBC jdbc;
+    private JDBC(){}
+    public static JDBC getInstance(){
+        if (jdbc==null)
+        {
+            jdbc=new  JDBC();
+        }
+        return jdbc;
+    }
+
+    String DataBaseURL="jdbc:mysql://localhost:3306/zohoproject";
     String Username="root";
     String Password="password";
     Connection connection;
     Statement statement;
     ResultSet resultSet;
-    private void openConnection(){
-        try{
-            //Class.forName("com.mysql.cj.jdbc.Driver");
+    private Connection getConnection(){
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(DataBaseURL, Username, Password);
             statement=connection.createStatement();
-        }catch(SQLException e){
-            System.out.println("Cannot connect to dataBase");
+        } catch (ClassNotFoundException | SQLException e) {
+            throw new RuntimeException(e);
         }
+            return connection;
     }
-    ResultSet executeQuery(String query)
-    {
+    ResultSet executeQuery(String query){
         try
         {
-            openConnection();
+            connection=this.getConnection();
             resultSet=statement.executeQuery(query);
         }
         catch(SQLException e)
@@ -34,7 +46,7 @@ public class DConnect {
     }
     ResultSet executeQuery(PreparedStatement preparedStatement) {
         try {
-            openConnection();
+            connection=this.getConnection();
             resultSet = preparedStatement.executeQuery();
         }
         catch (SQLException e){
@@ -46,7 +58,7 @@ public class DConnect {
     void executeUpdate(String query){
         try
         {
-            openConnection();
+            connection=getConnection();
             statement.executeUpdate(query);
         }
         catch(SQLException e)
@@ -57,7 +69,7 @@ public class DConnect {
     }
     void executeUpdate(PreparedStatement preparedStatement) {
         try {
-            openConnection();
+            connection=getConnection();
             preparedStatement.executeUpdate();
         }
         catch (SQLException e){
@@ -68,7 +80,7 @@ public class DConnect {
         }
     }
     PreparedStatement getPreparedStatement(String query) throws SQLException {
-        openConnection();
+        connection=getConnection();
         return connection.prepareStatement(query);
     }
 

@@ -33,7 +33,7 @@ public class Patient {
     }
 
     private void viewMedication(String email) throws SQLException {
-        DConnect db=new DConnect();
+        JDBC db=JDBC.getInstance();
         ResultSet resultSet=db.executeQuery(Query.getMedicineName(email));
         Design.medications();
         while (resultSet.next())

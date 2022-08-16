@@ -8,7 +8,7 @@ public class User {
 
     static Scanner scanner;
     public User(String name,String role,String email) throws SQLException {
-        DConnect db=new DConnect();
+        JDBC db=JDBC.getInstance();
         PreparedStatement preparedStatement= db.getPreparedStatement(Query.insertIntoUserDetails);
         preparedStatement.setString(1,name);
         preparedStatement.setString(2,role);
@@ -48,7 +48,7 @@ public class User {
         }
 
         void addUser(String role) throws SQLException {
-        DConnect db=new DConnect();
+        JDBC db=JDBC.getInstance();
         ResultSet resultSet=db.executeQuery(Query.getPriority(role));
         resultSet.next();
         int loginPriority=resultSet.getInt(1);
@@ -97,7 +97,7 @@ public class User {
     }
 
      void ViewDetails(String role) throws SQLException{
-        DConnect db=new DConnect();
+        JDBC db=JDBC.getInstance();
         int counter=1;
         Scanner scanner=new Scanner(System.in);
         ResultSet resultSet=db.executeQuery(Query.getPriority(role));
@@ -116,7 +116,7 @@ public class User {
         DataBase.printDetails(roleName);
     }
     public static int getUserId(String email) throws SQLException {
-        DConnect db=new DConnect();
+        JDBC db=JDBC.getInstance();
         ResultSet resultSet=db.executeQuery(Query.getUserId(email));
         resultSet.next();
         return resultSet.getInt(1);
